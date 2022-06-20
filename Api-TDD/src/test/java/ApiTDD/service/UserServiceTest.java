@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -11,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,31 +36,30 @@ public class UserServiceTest {
 	@MockBean
 	UserRepository userRepository;
 	
-	static private UserModel user;
-	static private Optional<UserModel> optionalUser;
-	static private UserResponseDto userResponseDto;
+	private UserModel user;
+	private Optional<UserModel> optionalUser;
+	private UserResponseDto userResponseDto;
 	
 	
 	
-	@BeforeAll
-	static void setup () {
+	@BeforeEach
+	void setup () {
 		user = new UserModel(1, "joao", "joao@gmail.com", "1234", LocalDateTime.now(), LocalDateTime.now());
 		userResponseDto = new UserResponseDto(1, "joao", "joao@gmail.com");
-		optionalUser = Optional.of(user);
+		optionalUser = Optional.of(new UserModel(1, "joao", "joao@gmail.com", "1234", LocalDateTime.now(), LocalDateTime.now()));
 	}
 	
 	@Test
 	void whenFindByIdThenReturnAnUser() {
 		when(userRepository.findById(anyLong())).thenReturn(optionalUser);
 		
-		UserModel response = userService.findById(1);
+		UserResponseDto response = userService.findById(1);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(UserModel.class, response.getClass(), "Should return a User");
-		Assertions.assertEquals(user.getId(), response.getId());
-		Assertions.assertEquals(user.getName(), response.getName());
-		Assertions.assertEquals(user.getEmail(), response.getEmail());
-		Assertions.assertEquals(user.getPassword(), response.getPassword());
+		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
+		Assertions.assertEquals(optionalUser.get().getId(), response.getId());
+		Assertions.assertEquals(optionalUser.get().getName(), response.getName());
+		Assertions.assertEquals(optionalUser.get().getEmail(), response.getEmail());
 	}
 	
 	@Test
@@ -64,7 +67,7 @@ public class UserServiceTest {
 		when(userRepository.findById(anyLong())).thenThrow(new ObjectNotFoundException("User not found!"));
 		
 		try {
-			UserModel response = userService.findById(1);
+			userService.findById(1);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			Assertions.assertEquals(ObjectNotFoundException.class, e.getClass(), "Should throw a exception ObjectNotFoundException");
@@ -76,45 +79,92 @@ public class UserServiceTest {
 	void whenFindAllThenReturnAnListOfUsers() {
 		when(userRepository.findAll()).thenReturn(List.of(user));
 		
-		List<UserModel> response = userService.findAll();
+		List<UserResponseDto> response = userService.findAll();
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1, response.size(), "Should return a list of one User");
-		Assertions.assertEquals(UserModel.class, response.get(0).getClass(), "Should return a list of UserModel");
+		Assertions.assertEquals(UserResponseDto.class, response.get(0).getClass(), "Should return a list of UserModel Dto");
 		Assertions.assertEquals(user.getId(), response.get(0).getId());
 		Assertions.assertEquals(user.getName(), response.get(0).getName());
 		Assertions.assertEquals(user.getEmail(), response.get(0).getEmail());
-		Assertions.assertEquals(user.getPassword(), response.get(0).getPassword());
 
 	}
 	
 	@Test
 	void whenCreateThenReturnSuccess() {
-		when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
 		when(userRepository.save(any(UserModel.class))).thenReturn(user);
 		
 		UserResponseDto response = userService.create(user);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a UserModel");
+		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
+		Assertions.assertEquals(optionalUser.get().getId(), response.getId());
+		Assertions.assertEquals(optionalUser.get().getName(), response.getName());
+		Assertions.assertEquals(optionalUser.get().getEmail(), response.getEmail());
+	}
+	
+	@Test
+	void whenCreateThenReturnAndDataIntegrityViolationException() {
+		optionalUser.get().setId(2);
+		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+		when(userRepository.save(any(UserModel.class))).thenReturn(user);
+		
+		try {
+			userService.create(user);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			Assertions.assertEquals(DataIntegrityViolationException.class, e.getClass(), "Should throw a exception DataIntegrityViolationException");
+			Assertions.assertEquals("Email already exists!", e.getMessage(), "Should throw a exception message \"Email already exists!\"");
+		}
+	}
+	
+	@Test
+	void whenUpdateThenReturnSuccess() {
+		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+		when(userRepository.save(any(UserModel.class))).thenReturn(user);
+		
+		UserResponseDto response = userService.update(user);
+		
+		Assertions.assertNotNull(response);
+		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
 		Assertions.assertEquals(user.getId(), response.getId());
 		Assertions.assertEquals(user.getName(), response.getName());
 		Assertions.assertEquals(user.getEmail(), response.getEmail());
 	}
 	
 	@Test
-	void whenCreateThenReturnAndDataIntegrityViolationException() {
+	void whenUpdateThenReturnAndDataIntegrityViolationException() {
+		optionalUser.get().setId(2);
 		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
 		when(userRepository.save(any(UserModel.class))).thenReturn(user);
 		
 		try {
-			UserResponseDto response  = userService.create(user);
+			userService.update(user);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			Assertions.assertEquals(DataIntegrityViolationException.class, e.getClass(), "Should throw a exception DataIntegrityViolationException");
 			Assertions.assertEquals("Email already exists!", e.getMessage(), "Should throw a exception message \"Email already exists!\"");
 		}
+	}
+	
+	@Test
+	void whenDeleteThenReturnSuccess() {
+		doNothing().when(userRepository).deleteById(anyLong());
 		
-
+		userService.delete(1);
+		verify(userRepository, times(1)).deleteById(anyLong());
+	}
+	
+	@Test
+	void whenDeleteThenReturnAnObjectNotFoundException() {
+		doThrow(new ObjectNotFoundException("User not found!")).when(userRepository).deleteById(anyLong());
+		
+		try {
+			userService.delete(1);
+		} catch (Exception e) {
+			Assertions.assertEquals(ObjectNotFoundException.class, e.getClass(), "Should throw a exception ObjectNotFoundException");
+			Assertions.assertEquals("User not found!", e.getMessage(), "Should throw a exception message \"User not found!\"");
+		}
 	}
 }

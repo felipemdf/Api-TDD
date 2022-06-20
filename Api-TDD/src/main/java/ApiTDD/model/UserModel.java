@@ -15,9 +15,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor @NoArgsConstructor
-@Getter
+@Getter @Setter
 @Table(name = "`user`") @Entity
 public class UserModel {
 	
