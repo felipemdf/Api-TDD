@@ -53,13 +53,14 @@ public class UserServiceTest {
 	void whenFindByIdThenReturnAnUser() {
 		when(userRepository.findById(anyLong())).thenReturn(optionalUser);
 		
-		UserResponseDto response = userService.findById(1);
+		UserModel response = userService.findById(1);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
+		Assertions.assertEquals(UserModel.class, response.getClass(), "Should return a User Dto");
 		Assertions.assertEquals(optionalUser.get().getId(), response.getId());
 		Assertions.assertEquals(optionalUser.get().getName(), response.getName());
 		Assertions.assertEquals(optionalUser.get().getEmail(), response.getEmail());
+		Assertions.assertEquals(optionalUser.get().getPassword(), response.getPassword());
 	}
 	
 	@Test
@@ -79,14 +80,15 @@ public class UserServiceTest {
 	void whenFindAllThenReturnAnListOfUsers() {
 		when(userRepository.findAll()).thenReturn(List.of(user));
 		
-		List<UserResponseDto> response = userService.findAll();
+		List<UserModel> response = userService.findAll();
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1, response.size(), "Should return a list of one User");
-		Assertions.assertEquals(UserResponseDto.class, response.get(0).getClass(), "Should return a list of UserModel Dto");
+		Assertions.assertEquals(UserModel.class, response.get(0).getClass(), "Should return a list of UserModel Dto");
 		Assertions.assertEquals(user.getId(), response.get(0).getId());
 		Assertions.assertEquals(user.getName(), response.get(0).getName());
 		Assertions.assertEquals(user.getEmail(), response.get(0).getEmail());
+		Assertions.assertEquals(optionalUser.get().getPassword(), response.get(0).getPassword());
 
 	}
 	
@@ -95,13 +97,15 @@ public class UserServiceTest {
 		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
 		when(userRepository.save(any(UserModel.class))).thenReturn(user);
 		
-		UserResponseDto response = userService.create(user);
+		UserModel response = userService.create(user);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
+		Assertions.assertEquals(UserModel.class, response.getClass(), "Should return a User Dto");
 		Assertions.assertEquals(optionalUser.get().getId(), response.getId());
 		Assertions.assertEquals(optionalUser.get().getName(), response.getName());
 		Assertions.assertEquals(optionalUser.get().getEmail(), response.getEmail());
+		Assertions.assertEquals(optionalUser.get().getPassword(), response.getPassword());
+		
 	}
 	
 	@Test
@@ -124,13 +128,15 @@ public class UserServiceTest {
 		when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
 		when(userRepository.save(any(UserModel.class))).thenReturn(user);
 		
-		UserResponseDto response = userService.update(user);
+		UserModel response = userService.update(user);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(UserResponseDto.class, response.getClass(), "Should return a User Dto");
+		Assertions.assertEquals(UserModel.class, response.getClass(), "Should return a User Dto");
 		Assertions.assertEquals(user.getId(), response.getId());
 		Assertions.assertEquals(user.getName(), response.getName());
 		Assertions.assertEquals(user.getEmail(), response.getEmail());
+		Assertions.assertEquals(user.getPassword(), response.getPassword());
+		
 	}
 	
 	@Test

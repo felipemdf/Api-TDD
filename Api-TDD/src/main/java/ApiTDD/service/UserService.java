@@ -18,31 +18,29 @@ public class UserService {
 	@Autowired
 	UserRepository userRepository;
 	
-	public UserResponseDto findById(Integer id) {
+	public UserModel findById(Integer id) {
 		Optional<UserModel> user = userRepository.findById(Long.valueOf(id));
-		UserResponseDto userDto = UserResponseDto.toUserReponseDto(user.orElseThrow(() -> new ObjectNotFoundException(1 ,"User not found")));
 		
-		return userDto;
+		return user.orElseThrow(() -> new ObjectNotFoundException(1 ,"User not found"));
 	}
 
-	public List<UserResponseDto> findAll() {
+	public List<UserModel> findAll() {
 		List<UserModel> ListUser = userRepository.findAll();
-		List<UserResponseDto> listUserDto = UserResponseDto.listToUserReponseDto(ListUser);
 		
-		return listUserDto;
+		return ListUser;
 	}
 
-	public UserResponseDto create(UserModel newUser) {
+	public UserModel create(UserModel newUser) {
 		validEmail(newUser);
 		UserModel user = userRepository.save(newUser);
 		
-		return UserResponseDto.toUserReponseDto(user);
+		return user;
 	}
 	
-	public UserResponseDto update(UserModel newUser) {
+	public UserModel update(UserModel newUser) {
 		validEmail(newUser);
 		UserModel user = userRepository.save(newUser);
-		return UserResponseDto.toUserReponseDto(user);
+		return user;
 	}
 
 	public void delete(Integer id) {
