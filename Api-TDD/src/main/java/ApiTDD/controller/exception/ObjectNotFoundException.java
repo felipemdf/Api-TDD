@@ -1,4 +1,4 @@
-package ApiTDD.Exception;
+package ApiTDD.controller.exception;
 
 public class ObjectNotFoundException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
