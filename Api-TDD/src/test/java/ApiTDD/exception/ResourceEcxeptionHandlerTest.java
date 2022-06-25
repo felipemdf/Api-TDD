@@ -38,8 +38,6 @@ public class ResourceEcxeptionHandlerTest {
 	     assertEquals(ResponseEntity.class, response.getClass());
 	     assertEquals(StandartError.class, response.getBody().getClass());
 	     assertEquals("Object not found!", response.getBody().getError());
-	     assertEquals(404, response.getBody().getStatus());
-	     assertNotEquals(LocalDateTime.now(), response.getBody().getTimestamp());
 	 }
 	 
 	 @Test
@@ -52,11 +50,9 @@ public class ResourceEcxeptionHandlerTest {
 
 	     assertNotNull(response);
 	     assertNotNull(response.getBody());
-	     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	     assertEquals(ResponseEntity.class, response.getClass());
 	     assertEquals(StandartError.class, response.getBody().getClass());
 	     assertEquals("Email already exists!", response.getBody().getError());
-	     assertEquals(404, response.getBody().getStatus());
-	     assertNotEquals(LocalDateTime.now(), response.getBody().getTimestamp());
 	 }
 }

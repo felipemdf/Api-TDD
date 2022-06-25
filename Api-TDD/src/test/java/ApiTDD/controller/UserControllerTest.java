@@ -76,12 +76,23 @@ public class UserControllerTest {
 	
 	@Test
 	void whenCreateThenReturnCreated() {
-		when(userService.update(any(UserModel.class))).thenReturn(user);
+		when(userService.create(any(UserModel.class))).thenReturn(user);
 		ResponseEntity<UserResponseDto> response = userController.create(user);
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertNotNull(response.getBody());
 		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Should return a status code 201");
+		Assertions.assertEquals(ResponseEntity.class, response.getClass(), "Should return a ResponseEntity");
+		Assertions.assertNotNull(response.getHeaders().get("Location"));
+	}
+	
+	@Test
+	void whenCreateThenReturnSuccess() {
+		when(userService.update(any(UserModel.class))).thenReturn(user);
+		ResponseEntity<UserResponseDto> response = userController.update(1, user);
+		
+		Assertions.assertNotNull(response);
+		Assertions.assertNotNull(response.getBody());
+		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Should return a status code 200");
 		Assertions.assertEquals(ResponseEntity.class, response.getClass(), "Should return a ResponseEntity");
 		Assertions.assertEquals(UserResponseDto.class, response.getBody().getClass(), "Should return a UserReponseDto");
 		Assertions.assertEquals(user.getId(), response.getBody().getId());
@@ -89,10 +100,11 @@ public class UserControllerTest {
 		Assertions.assertEquals(user.getName(), response.getBody().getName());
 	}
 	
+	
 	@Test
-	void whenDeleteThenReturnCreated() {
+	void whenDeleteThenReturnSuccess() {
 		doNothing().when(userService).delete(anyInt());
-		ResponseEntity<UserResponseDto> response = userController.delete(user);
+		ResponseEntity<UserResponseDto> response = userController.delete(1);
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(ResponseEntity.class, response.getClass(), "Should return a ResponseEntity");
