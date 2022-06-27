@@ -19,7 +19,13 @@ services:
       - POSTGRES_PASSWORD=admin
     networks:
       - network-apiTDD-postgresql
+    volumes: 
+      - db:/var/lib/postgresql/data
 
 networks:
   network-apiTDD-postgresql:
     driver: bridge
+
+volumes:
+  db:
+    driver: local
