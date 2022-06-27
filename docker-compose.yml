@@ -1,0 +1,25 @@
+version: '1.0'
+services:
+  app:
+    container_name: api-TDD
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dbpostgresql
+    networks:
+      - network-apiTDD-postgresql
+  dbpostgresql:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=fenda_biquini
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    networks:
+      - network-apiTDD-postgresql
+
+networks:
+  network-apiTDD-postgresql:
+    driver: bridge

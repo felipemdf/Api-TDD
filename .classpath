@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Api-TDD/src/main/java"/>
+	<classpathentry kind="src" path="Api-TDD/src/test/java"/>
+	<classpathentry kind="lib" path="Api-TDD/.mvn/wrapper/maven-wrapper.jar"/>
+	<classpathentry kind="lib" path="api.jar"/>
+	<classpathentry kind="output" path="Api-TDD/target/classes"/>
+</classpath>
