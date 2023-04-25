@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -31,6 +34,7 @@ public class UserController {
 		return ResponseEntity.ok().body(userDto);
 	}
 
+	@GetMapping
 	public ResponseEntity<List<UserResponseDto>> findAll() {
 		List<UserModel> users = userService.findAll();
 		
@@ -38,6 +42,7 @@ public class UserController {
 		return ResponseEntity.ok().body(usersDto);
 	}
 
+	@PostMapping
 	public ResponseEntity<UserResponseDto> create(UserModel user) {
 		URI uri = ServletUriComponentsBuilder
 				.fromCurrentRequest()
@@ -48,6 +53,7 @@ public class UserController {
 		return ResponseEntity.created(uri).build();
 	}
 	
+	@PatchMapping
 	public ResponseEntity<UserResponseDto> update (@PathVariable Integer id, UserModel user) {
 		user.setId(id);
 		UserModel newUser = userService.update(user);
@@ -56,6 +62,7 @@ public class UserController {
 		return ResponseEntity.ok().body(userDto);
 	}
 
+	@DeleteMapping
 	public ResponseEntity<UserResponseDto> delete(@PathVariable Integer id) {
 		userService.delete(id);
 		return ResponseEntity.noContent().build();
